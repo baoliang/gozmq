@@ -37,6 +37,7 @@ import (
 	"errors"
 	"syscall"
 	"unsafe"
+	“bytes”
 )
 
 type Context interface {
@@ -343,7 +344,7 @@ func (s *zmqSocket) Connect(address string) error {
 
 // Send a message to the socket.
 // int zmq_send (void *s, zmq_msg_t *msg, int flags);
-func (s *zmqSocket) Send(data []byte, flags SendRecvOption) error {
+func (s *zmqSocket) Send(data bytes.Buffer, flags SendRecvOption) error {
 	var m C.zmq_msg_t
 	// Copy data array into C-allocated buffer.
 	size := C.size_t(len(data))
@@ -367,7 +368,7 @@ func (s *zmqSocket) Send(data []byte, flags SendRecvOption) error {
 
 // Receive a message from the socket.
 // int zmq_recv (void *s, zmq_msg_t *msg, int flags);
-func (s *zmqSocket) Recv(flags SendRecvOption) (data []byte, err error) {
+func (s *zmqSocket) Recv(flags SendRecvOption) (data bytes.Buffer, err error) {
 	// Allocate and initialise a new zmq_msg_t
 	var m C.zmq_msg_t
 	if C.zmq_msg_init(&m) != 0 {
